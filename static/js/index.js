@@ -37,6 +37,10 @@ var coins = 0;
 //hacking
 var hack = false;
 
+// scanning
+var scan = false;
+var computers_scanning = [];  // array of coords(x, y)
+
 
 //key
 var keys = [];
@@ -158,6 +162,9 @@ function renderBackground(x, y) {
     var hacker = new Image();
     hacker.src = 'static/pictures/hacker.jpg';
     context.drawImage(hacker,595, 530, 70, 60);
+    var scanner = new Image();  // draw scan button
+    scanner.src = 'static/pictures/scan.jpg';
+    context.drawImage(scanner,690, 530, 70, 60);
 
     //hover elements
     if(hover_create_socket){
@@ -187,7 +194,10 @@ function renderBackground(x, y) {
       canvas.removeEventListener('click', game_set_mining, false);
     }
     if(!hack){
-      canvas.removeEventListener('click', hacker_attack_computer, false);
+      canvas.removeEventListener('click', game_hack_computer, false);
+    }
+    if(!scan){
+      canvas.removeEventListener('click', game_computer_scan, false);
     }
     //canvas.removeEventListener('click', game_make_socket_second, false);
     if(one){
@@ -226,6 +236,14 @@ function renderBackground(x, y) {
       text = "Choose a computer to hack to disable a player's connection"
       context.fillStyle = 'white';
       context.fillText(text,350,100,1000);
+    } else if (scan){
+          context.globalAlpha = 0.5;
+          context.fillStyle = 'black';
+          context.fillRect(0, 0, 1400, 200);
+          context.globalAlpha = 1;
+          text = "Select a computer to scan for password"
+          context.fillStyle = 'white';
+          context.fillText(text,350,100,1000);
     }
     //draw connected lines
     for(var i = 0;i<connected.length;i++){
@@ -243,6 +261,12 @@ function renderBackground(x, y) {
       text = 'Mining...';
       context.fillText(text,mining[i][0]-x-10,mining[i][1]+40-y,100);
     }
+    for(var i = 0;i<computers_scanning.length;i++){  // display scanning on top of computers scanning
+          //console.log(computers_scanning[i]);
+          context.fillStyle = 'black';
+          text = 'Scanning...';
+          context.fillText(text,computers_scanning[i][0]-x-10,computers_scanning[i][1]+40-y,100);
+        }
 
   }
   
@@ -333,7 +357,13 @@ canvas.addEventListener('click', function(event) {
   else if(595<=click_x && click_x<=595+70 && 530<=click_y && click_y<=530+60){
     console.log('hackerman!');
     hack = true;
-    canvas.addEventListener('click', hacker_attack_computer, false);
+    canvas.addEventListener('click', game_hack_computer, false);
+    renderBackground(x,y);
+  }
+  else if(690<=click_x && click_x<=690+70 && 530<=click_y && click_y<=530+60){
+    console.log('zeet zeet scanning');
+    scan = true;
+    canvas.addEventListener('click', game_computer_scan, false);
     renderBackground(x,y);
   }
 
@@ -453,7 +483,7 @@ socket.on('fail_create_connection', message => {
 });
 
 
-function hacker_attack_computer(event) {
+function game_hack_computer(event) {
   console.log('attack first stage!');
   var click_x = event.x+x;
   var click_y = event.y+y;
@@ -493,6 +523,41 @@ socket.on('remove_connections', (hacked_coord) => {
 socket.on('got_hacked', (message) => {
   alert(message);
 });
+
+function game_computer_scan(event){
+  var click_x = event.x+x;
+    var click_y = event.y+y;
+    for(var i = 0;i<coods.length;i++){
+      // check if own computer
+      if(coods[i][0]<=click_x && click_x<=coods[i][0]+40 && coods[i][1]<=click_y && click_y<=coods[i][1]+40){
+        var stop = false;
+        //console.log(computers_scanning);
+        for (var j=0;j<computers_scanning.length;j++){
+          // check if computer scanning
+          if(computers_scanning[j][0] == coods[i][0] && computers_scanning[j][1] == coods[i][1]){
+            stop = true;
+            scan = false;
+            computers_scanning.splice(j,1);
+            //console.log(computers_scanning);
+            console.log('stop computers_scanning');
+            renderBackground(x,y);
+          }
+        }
+        if(!stop){
+          //console.log("Success!");
+          first = [coods[i][0],coods[i][1]];
+          scan = false;
+          computers_scanning.push(coods[i]);
+          socket.emit('create_computers_scanning',(coods[i]));
+          //console.log('clicked!');
+          //console.log(computers_scanning);
+          renderBackground(x,y);
+        }
+      }
+    }
+}
+
+
 function Remove(){
   const playMenu = document.getElementById('play-menu');
   const usernameInput = document.getElementById('username-input');
