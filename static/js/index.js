@@ -48,7 +48,7 @@ var computers_scanning = [];  // array of coords(x, y)
 var keys = [];
 
 //username
-var username;
+var username = '';
 
 var x = 0;
 var y = 0;
@@ -86,6 +86,7 @@ socket.on('add_user', user => {
     users[[user[i][0],user[i][1]]] = user[0];
     keys.push([user[i][0],user[i][1]]);
   }
+  console.log(username);
   for(var key in users) {
     if(username == users[key]){
       coods.push(JSON.parse("[" + key + "]"));
