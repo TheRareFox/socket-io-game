@@ -60,6 +60,7 @@ socket.on('create', (objects,linked) => {
 
 
 socket.on('del_user',(user,linked) =>{
+  console.log(user);
   user = JSON.parse(user);
   connected = linked;
   console.log(user);
