@@ -145,10 +145,10 @@ def hack_computer(position, username):
 def scan_progressed(_id, coords):
     with app.app_context():
         users_scanned[_id]['progress'] += 1
-        if users_scanned[_id]['progress'] >= 10:  # "seconds" passed
+        if users_scanned[_id]['progress'] >= 20:  # "seconds" passed
             random_index = random.choice(users_scanned[_id]['unfound'])
             users_scanned[_id]['found'][random_index] = password[random_index]
-            users_scanned[_id]['progress'] -= 10  # remove done progress
+            users_scanned[_id]['progress'] -= 20  # remove done progress
             del users_scanned[_id]['unfound'][users_scanned[_id]['unfound'].index(random_index)]
         user_found_password = ''.join(users_scanned[_id]['found'])
         if user_found_password == password:
