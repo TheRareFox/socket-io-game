@@ -10,7 +10,7 @@ app.config['SECRET_KEY'] = 'secret!'
 app.config['DEBUG'] = True
 app.config['PRESERVE_CONTEXT_ON_EXCEPTION'] = False
 app.app_context()
-socketio = SocketIO(app, async_mode='threading', logger=True, engineio_logger=True, cors_allowed_origins='http://127.0.0.1:5000')#'https://flask-socketio-game.herokuapp.com')
+socketio = SocketIO(app, async_mode='threading', logger=True, engineio_logger=True, cors_allowed_origins='https://flask-socketio-game.herokuapp.com')
 
 password = 'sTrInG_fOr_TeStIng'
 
