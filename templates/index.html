@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test</title>
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <link rel = "stylesheet" href = "static/css/index.css">
 </head>
 <body>
@@ -13,7 +14,6 @@
       <p>Your browser does not support HTML5!</p>
     </canvas>      
 
-    <script src = 'static/js/index.js'></script>
     <div id="play-menu" >
         <h1>A .io game</h1>
         <p>
@@ -22,8 +22,12 @@
         <hr />
         <input type="text" id="username-input" placeholder="Enter Username" />
         <button id="play-button"  onclick= "Remove()" >PLAY</button>
-      </div>
-      
+    </div>
+    <div id="progress-holder">
+        <div id="scanning_progress">
+        </div>
+    </div>
+    <script src = 'static/js/index.js'></script>
 
 </body>
 </html>

@@ -4,10 +4,11 @@ const context = canvas.getContext('2d');
 //music
 var bg_music = new Audio('static/audio/bg_music.mp3');
 
+//password
+var password = [];
 
 //hover 
 var hover_create_socket = false;
-
 var socket = io();
 // all the computers available [[x, y], [x1, y1]]
 var computers = [];
@@ -35,12 +36,13 @@ var mining = [];
 var coins = 0;
 
 //hacking
-var hack = false;
+var hack = false;   
 
 // scanning
+const scanning_progress = document.getElementById('scanning_progress');
 var scan = false;
 var computers_scanning = [];  // array of coords(x, y)
-
+//scanning progress
 
 //key
 var keys = [];
@@ -145,42 +147,55 @@ function renderBackground(x, y) {
     //create hud
     context.globalAlpha = 0.2;
     context.fillStyle = 'black';
-    context.fillRect(400, 520, 500, 80); 
+    context.fillRect(canvas.width/2 -250, canvas.height -160, 500, 80); 
     context.globalAlpha = 0.5;
-    context.fillRect(510, 460, 250, 40); 
+    context.fillRect(canvas.width/2 -125, canvas.height -220, 250, 40); 
     context.globalAlpha = 1;
     var doge = new Image();
     doge.src = 'static/pictures/coin.jpg';
-    context.drawImage(doge,520,465,30,30);
-    context.fillText(coins,555,485,30,30);
+    context.drawImage(doge,canvas.width/2 -120, canvas.height -215,30,30);
+    context.fillText(coins,canvas.width/2 -85, canvas.height -195,30,30);
     var server = new Image();
     server.src = 'static/pictures/socket.jpg';
-    context.drawImage(server,405, 530, 70, 60);
+    context.drawImage(server,canvas.width/2 -240, canvas.height -150, 70, 60);
     var mining_picture = new Image();
     mining_picture.src = 'static/pictures/mining.jpg';
-    context.drawImage(mining_picture,500, 530, 70, 60);
+    context.drawImage(mining_picture,canvas.width/2 -160, canvas.height -150, 70, 60);
     var hacker = new Image();
     hacker.src = 'static/pictures/hacker.jpg';
-    context.drawImage(hacker,595, 530, 70, 60);
+    context.drawImage(hacker,canvas.width/2 -80, canvas.height -150, 70, 60);
     var scanner = new Image();  // draw scan button
     scanner.src = 'static/pictures/scan.jpg';
-    context.drawImage(scanner,690, 530, 70, 60);
+    context.drawImage(scanner,canvas.width/2, canvas.height -150, 70, 60);
 
     //hover elements
     if(hover_create_socket){
       context.globalAlpha = 0.5;
       context.fillStyle = 'black';
-      context.fillRect(500, 300, 300, 200); 
+      context.fillRect(canvas.width/2-150, canvas.height/2-140, 330, 220); 
       context.globalAlpha = 1;
-      text = 'Create socket with another computer';
-      context.fillStyle = 'white';
-      context.fillText(text,510,330,1000);
-      text = 'Link your computer with another free computer by using a socket to connect them';
-      context.fillText(text,510,330,1000);
-      text = 'Once they are connected you are able to send messages to the other computer';
-      context.fillText(text,510,330,1000);
-      text = 'You can order them to mine for more coins or scan for clues';
-      context.fillText(text,510,330,1000);
+      
+      context.fillStyle = '#33ccff';
+      text = 'Create socket with';
+      context.fillText(text,canvas.width/2-140,canvas.height/2-120,290);
+      text = 'another computer';
+      context.fillText(text,canvas.width/2-140,canvas.height/2-100,290);
+      text = 'Link your computer with';
+      context.fillText(text,canvas.width/2-140,canvas.height/2-80,290);
+      text = 'another free computer by';
+      context.fillText(text,canvas.width/2-140,canvas.height/2-60,290);
+      text = 'using a socket to connect them';
+      context.fillText(text,canvas.width/2-140,canvas.height/2-40,290);
+      text = 'Once they are connected';
+      context.fillText(text,canvas.width/2-140,canvas.height/2-20,290);
+      text = 'you are able to send messages';
+      context.fillText(text,canvas.width/2-140,canvas.height/2,290);
+      text = 'to the other computer';
+      context.fillText(text,canvas.width/2-140,canvas.height/2+20,290);
+      text = 'You can order them to';
+      context.fillText(text,canvas.width/2-140,canvas.height/2+40,290);
+      text = 'mine for more coins or scan for clues';
+      context.fillText(text,canvas.width/2-140,canvas.height/2+60,290);
     }
 
     //remove game-create-socket
@@ -199,51 +214,51 @@ function renderBackground(x, y) {
     if(!scan){
       canvas.removeEventListener('click', game_computer_scan, false);
     }
-    //canvas.removeEventListener('click', game_make_socket_second, false);
+
     if(one){
       //create interface
       context.globalAlpha = 0.5;
       context.fillStyle = 'black';
-      context.fillRect(0, 0, 1400, 200); 
+      context.fillRect(0, 0,canvas.width, 200); 
       context.globalAlpha = 1;
       text = 'Click on a computer that you own';
       context.fillStyle = 'white';
-      context.fillText(text,500,100,1000);
+      context.fillText(text,canvas.width/2-100,100,1000);
     }
     if(second){
       context.globalAlpha = 0.5;
       context.fillStyle = 'black';
-      context.fillRect(0, 0, 1400, 200); 
+      context.fillRect(0, 0, canvas.width, 200); 
       context.globalAlpha = 1;
       text = 'Click on a computer that you want to create a socket to connect to'
       context.fillStyle = 'white';
-      context.fillText(text,350,100,1000);
+      context.fillText(text,canvas.width/2-200,100,1000);
     }
     if(mine){
       context.globalAlpha = 0.5;
       context.fillStyle = 'black';
-      context.fillRect(0, 0, 1400, 200); 
+      context.fillRect(0, 0, canvas.width, 200); 
       context.globalAlpha = 1;
       text = 'Choose a computer to start/stop mining for cryptocurrency'
       context.fillStyle = 'white';
-      context.fillText(text,350,100,1000);
+      context.fillText(text,canvas.width/2-200,100,1000);
     }
     if(hack){
       context.globalAlpha = 0.5;
       context.fillStyle = 'black';
-      context.fillRect(0, 0, 1400, 200); 
+      context.fillRect(0, 0, canvas.width, 200); 
       context.globalAlpha = 1;
       text = "Choose a computer to hack to disable a player's connection"
       context.fillStyle = 'white';
-      context.fillText(text,350,100,1000);
+      context.fillText(text,canvas.width/2-200,100,1000);
     } else if (scan){
           context.globalAlpha = 0.5;
           context.fillStyle = 'black';
-          context.fillRect(0, 0, 1400, 200);
+          context.fillRect(0, 0, canvas.width, 200);
           context.globalAlpha = 1;
           text = "Select a computer to scan for password"
           context.fillStyle = 'white';
-          context.fillText(text,350,100,1000);
+          context.fillText(text,canvas.width/2-150,100,1000);
     }
     //draw connected lines
     for(var i = 0;i<connected.length;i++){
@@ -267,7 +282,11 @@ function renderBackground(x, y) {
           text = 'Scanning...';
           context.fillText(text,computers_scanning[i][0]-x-10,computers_scanning[i][1]+40-y,100);
         }
-
+    context.fillStyle = 'black';
+    context.fillText('Password: ',canvas.width/2-200,canvas.height*0.9,1000);
+    for(var i = 0;i<password.length;i++){  // display currently scanned letters  
+      context.fillText(password[i]+' ',canvas.width/2-100+i*10,canvas.height*0.9,1000);
+    }
   }
   
 function dragMouse(canvas){
@@ -313,7 +332,7 @@ canvas.onmousemove = function(e) {
   var hover_x = e.clientX;
   var hover_y = e.clientY;
   hover_create_socket = false;
-  if(405<=hover_x && hover_x<=405+70 && 530<=hover_y && hover_y<=530+60){
+  if(canvas.width/2 -240<=hover_x && hover_x<=canvas.width/2 -170 && canvas.height -150<=hover_y && hover_y<=canvas.height -80){
     hover_create_socket = true;
     renderBackground(x,y);
   }
@@ -339,29 +358,45 @@ canvas.addEventListener('click', function(event) {
   var click_y = event.y;
   console.log(click_x);
   console.log(click_y);
-  if(405<=click_x && click_x<=405+70 && 530<=click_y && click_y<=530+60){
+  // connect option
+  if(canvas.width/2 -240<=click_x && click_x<=canvas.width/2 -170 && canvas.height -150<=click_y && click_y<=canvas.height -80){
     console.log('clicked');
     //console.log(coods);
     one = true;
-    
+    second = false;
+    mine = false;
+    hack = false;
+    scan = false;
     canvas.addEventListener('click', game_make_socket, false);
     renderBackground(x,y);
 
   }
-  else if(500<=click_x && click_x<=500+70 && 530<=click_y && click_y<=530+60){
+  else if(canvas.width/2 -160<=click_x && click_x<=canvas.width/2 -90 &&  canvas.height -150<=click_y && click_y<= canvas.height -80){
     console.log('set/stop server to mining cryptocurrency');
+    one = false;
+    second = false;
     mine = true;
+    hack = false;
+    scan = false;
     canvas.addEventListener('click', game_set_mining, false);
     renderBackground(x,y);
   }
-  else if(595<=click_x && click_x<=595+70 && 530<=click_y && click_y<=530+60){
+  else if(canvas.width/2 -80<=click_x && click_x<=canvas.width/2 -10 && canvas.height -150<=click_y && click_y<= canvas.height -80){
     console.log('hackerman!');
+    one = false;
+    second = false;
+    mine = false;
     hack = true;
+    scan = false;
     canvas.addEventListener('click', game_hack_computer, false);
     renderBackground(x,y);
   }
-  else if(690<=click_x && click_x<=690+70 && 530<=click_y && click_y<=530+60){
+  else if(canvas.width/2<=click_x && click_x<=canvas.width/2+70 && canvas.height -150<=click_y && click_y<= canvas.height -80){
     console.log('zeet zeet scanning');
+    one = false;
+    second = false;
+    mine = false;
+    hack = false;
     scan = true;
     canvas.addEventListener('click', game_computer_scan, false);
     renderBackground(x,y);
@@ -372,6 +407,11 @@ canvas.addEventListener('click', function(event) {
 function game_set_mining(event){
   var click_x = event.x+x;
   var click_y = event.y+y;
+  if(canvas.width/2 -160<=click_x-x && click_x-x<=canvas.width/2 -90 &&  canvas.height -150<=click_y-y && click_y-y<= canvas.height -80){
+    mine = false;
+    renderBackground(x,y);
+  }
+  else{
   for(var i = 0;i<coods.length;i++){
     if(coods[i][0]<=click_x && click_x<=coods[i][0]+40 && coods[i][1]<=click_y && click_y<=coods[i][1]+40){
       var stop = false;
@@ -386,6 +426,16 @@ function game_set_mining(event){
           renderBackground(x,y);
         }
       }
+      for(var j =0;j<computers_scanning.length;j++){
+        if(computers_scanning[j][0] == coods[i][0] && computers_scanning[j][1] == coods[i][1]){
+          scan = false;
+          computers_scanning.splice(j,1);
+          //console.log(computers_scanning);
+          console.log('stop computers_scanning');
+          renderBackground(x,y);
+
+        }
+      }
       if(!stop){
         //console.log("Success!");
         first = [coods[i][0],coods[i][1]];
@@ -398,7 +448,7 @@ function game_set_mining(event){
       }
     }
   }
-
+}
 }
 
 socket.on('mined_something', (points,coords) => {
@@ -431,15 +481,22 @@ function game_make_socket(event) {
   //console.log(click_x);
   //console.log(click_y);
   //console.log(coods);
-  for(var i = 0;i<coods.length;i++){
-    if(coods[i][0]-50<=click_x && click_x<=coods[i][0]+50 && coods[i][1]-50<=click_y && click_y<=coods[i][1]+50){
-        console.log("Success!");
-        first = [coods[i][0],coods[i][1]];
-        one = false;
-        second = true;
-        //create interface
-        renderBackground(x,y);
-        canvas.addEventListener('click', game_make_socket_second, false);
+  if(canvas.width/2 -240<=click_x-x && click_x-x<=canvas.width/2 -170 && canvas.height -150<=click_y-y && click_y-y<=canvas.height -80){
+    one = false;
+    console.log('quit');
+    renderBackground(x,y);
+  }
+  else{
+    for(var i = 0;i<coods.length;i++){
+      if(coods[i][0]-50<=click_x && click_x<=coods[i][0]+50 && coods[i][1]-50<=click_y && click_y<=coods[i][1]+50){
+          console.log("Success!");
+          first = [coods[i][0],coods[i][1]];
+          one = false;
+          second = true;
+          //create interface
+          renderBackground(x,y);
+          canvas.addEventListener('click', game_make_socket_second, false);
+      }  
     }
   }
 }
@@ -449,27 +506,33 @@ function game_make_socket_second(event) {
   var click_y = event.y+y;
   //console.log(click_x);
   //console.log(click_y);
-  for (var i = 0; i<computers.length; i++){
-    if(computers[i][0]<=click_x && click_x<=computers[i][0]+30 && computers[i][1]<=click_y && click_y <=computers[i][1]+30){
-      console.log('second computer created');
-      second = false;
-      
-      //caculate cost
-      diff_x = first[0] - computers[i][0];
-      diff_y = first[1] - computers[i][1];
-      distance = (Math.abs(diff_x^2) + Math.abs(diff_y^2))^0.5;
-      cost = Math.round(distance * 0.05);
-      console.log('cost:');
-      console.log(cost.toString());
-      alert('It will cost: ' + cost.toString());
-      //To be made into socket thingy
-      socket.emit('build_socket',(first),([computers[i][0],computers[i][1]]),(username),(cost));
+  if(canvas.width/2 -240<=click_x-x && click_x-x<=canvas.width/2 -170 && canvas.height -150<=click_y-y && click_y-y<=canvas.height -80){
+    second = false;
+    console.log('quit');
+    renderBackground(x,y);
+  }
+  else{
+    for (var i = 0; i<computers.length; i++){
+      if(computers[i][0]<=click_x && click_x<=computers[i][0]+30 && computers[i][1]<=click_y && click_y <=computers[i][1]+30){
+        console.log('second computer created');
+        second = false;
+        
+        //caculate cost
+        diff_x = first[0] - computers[i][0];
+        diff_y = first[1] - computers[i][1];
+        distance = (Math.abs(diff_x^2) + Math.abs(diff_y^2))^0.5;
+        cost = Math.round(distance * 0.05);
+        console.log('cost:');
+        console.log(cost.toString());
+        alert('It will cost: ' + cost.toString());
+        //To be made into socket thingy
+        socket.emit('build_socket',(first),([computers[i][0],computers[i][1]]),(username),(cost));
     }
   }
-
+  }
 }
-socket.on('create_connections', (cd1,cd2,name,cost) => {
-  coins -= cost;
+socket.on('create_connections', (cd1,cd2,name,points) => {
+  coins = points;
   console.log('creating');
   connected.push([cd1,cd2]);
   console.log(connected);
@@ -484,21 +547,28 @@ socket.on('fail_create_connection', message => {
 
 
 function game_hack_computer(event) {
+
   console.log('attack first stage!');
   var click_x = event.x+x;
   var click_y = event.y+y;
   //console.log(click_x);
   //console.log(click_y);
   //console.log(coods);
-  for(var i = 0;i<computers.length;i++){
-    if (computers[i][0]<=click_x && click_x<=computers[i][0]+30 && computers[i][1]<=click_y && click_y <=computers[i][1]+30){
-        console.log("Success select computer for hack!");
-        //create interface
-        // renderBackground(x,y);
-        hack = false;
-        socket.emit('hack_computer', ([computers[i][0],computers[i][1]]), (username));
-        renderBackground(x,y);
+  if(canvas.width/2 -80<=click_x-x && click_x-x<=canvas.width/2 -10 && canvas.height -150<=click_y-y && click_y-y<= canvas.height -80){
+    hack = false;
+    renderBackground(x,y);
+  }
+  else{
+    for(var i = 0;i<computers.length;i++){
+      if (computers[i][0]<=click_x && click_x<=computers[i][0]+30 && computers[i][1]<=click_y && click_y <=computers[i][1]+30){
+          console.log("Success select computer for hack!");
+          //create interface
+          // renderBackground(x,y);
+          hack = false;
+          socket.emit('hack_computer', ([computers[i][0],computers[i][1]]), (username));
+          renderBackground(x,y);
     }
+  }
   }
   
 }
@@ -524,17 +594,23 @@ socket.on('got_hacked', (message) => {
   alert(message);
 });
 
+
 function game_computer_scan(event){
   var click_x = event.x+x;
-    var click_y = event.y+y;
+  var click_y = event.y+y;
+  if(canvas.width/2<=click_x-x && click_x-x<=canvas.width/2+70 && canvas.height -150<=click_y-y && click_y-y<= canvas.height -80){
+    scan = false;
+    renderBackground(x,y);
+  }
+  else{
     for(var i = 0;i<coods.length;i++){
       // check if own computer
-      if(coods[i][0]<=click_x && click_x<=coods[i][0]+40 && coods[i][1]<=click_y && click_y<=coods[i][1]+40){
+      if(coods[i][0]<=click_x && click_x<=coods[i][0]+40 && coods[i][1]<=click_y && click_y<=coods[i][1]+40) {
         var stop = false;
         //console.log(computers_scanning);
         for (var j=0;j<computers_scanning.length;j++){
           // check if computer scanning
-          if(computers_scanning[j][0] == coods[i][0] && computers_scanning[j][1] == coods[i][1]){
+          if(computers_scanning[j][0] == coods[i][0] && computers_scanning[j][1] == coods[i][1]) {
             stop = true;
             scan = false;
             computers_scanning.splice(j,1);
@@ -555,7 +631,36 @@ function game_computer_scan(event){
         }
       }
     }
+
+  }
 }
+
+function updateValue(perc) {
+  scanning_progress.style.width = perc + '%';
+}  
+
+
+socket.on('scaned_stuff', (scan_progress,scan_coord,scan_password) => {
+  updateValue(scan_progress*5);
+  password = scan_password;
+  renderBackground(x,y);
+  //console.log(scan_password);
+  for (var i=0;i<computers_scanning.length;i++){
+    if (computers_scanning[i][0] == scan_coord[0] && computers_scanning[i][1] == scan_coord[1]){
+      socket.emit('create_computers_scanning',(scan_coord));
+    }
+  }
+});
+
+
+socket.on('game_won', (winning_string) => {
+  let url = window.location.href + 'win';
+  let form = $('<form action="' + url + '" method="post">' +
+    '<input type="text" name="password" value="' + winning_string + '" />' +
+    '</form>');
+  $('body').append(form);
+  form.submit();
+});
 
 
 function Remove(){

@@ -1,5 +1,5 @@
 from flask_socketio import SocketIO, send, emit, join_room, leave_room
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, redirect, url_for
 from objects import create_objects, find_object
 import random
 from threading import Timer
@@ -7,11 +7,11 @@ from threading import Timer
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 app.config['DEBUG'] = True
+app.config['PRESERVE_CONTEXT_ON_EXCEPTION'] = False
 app.app_context()
 socketio = SocketIO(app, async_mode='threading', logger=True, engineio_logger=True)
 
-password = list('sOmE_rAnDoM_sTrInG_fOr_TeStIng')
-password_string = 'sOmE_rAnDoM_sTrInG_fOr_TeStIng'
+password = 'sTrInG_fOr_TeStIng'
 
 # users dictionary:
 # key = id, value = [name,coords]
@@ -30,6 +30,7 @@ connected = []
 # user scanned items
 # key: socket id
 # value: dictionary of keys:
+# unfound: array of unfound indeces of password e.g. [0, 1, 2, 3...] for constant time
 # found: string of found password e.g. '~~~~~_World!' -> ~ means unfound
 # progress: integer of 0-59 (seconds) >= 60 gets a character of password
 users_scanned = {}
@@ -51,6 +52,15 @@ def mined_something(_id, coords):
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/win', methods=['POST'])
+def win():
+    password_gotten = request.form.get('password', None)
+    if not password_gotten or password_gotten == '' or len(password_gotten) != len(password):
+        return redirect(url_for(index))
+    else:
+        return render_template('won.html', password=password_gotten)
 
 
 @socketio.on('connect')
@@ -75,13 +85,13 @@ def build_socket(first_pos, second_pos, username, cost):
         users[request.sid].append(second_pos)
         users_objects[request.sid].append(computer)
         computer.set_user(request.sid)
-        emit('create_connections', (first_pos, second_pos, username, cost), namespace='/', broadcast=True)
+        emit('create_connections', (first_pos, second_pos, username, users_points[request.sid]), namespace='/', broadcast=True)
 
 
 @socketio.on('create_mining')
 def create_mining(coords):
     # print('recieved!')
-    t = Timer(0.1, mined_something, args=[request.sid, coords])
+    t = Timer(1, mined_something, args=[request.sid, coords])
     t.start()
 
 
@@ -133,23 +143,23 @@ def hack_computer(position, username):
 def scan_progressed(_id, coords):
     with app.app_context():
         users_scanned[_id]['progress'] += 1
-        if users_scanned[_id]['progress'] >= 60:  # 60 "seconds" passed
-            pw_length = len(password)  # get random char in password
-            pw_index = random.randint(pw_length)
-            while users_scanned[_id]['found'][pw_index] != '~':
-                pw_index = random.randint(pw_length)
-            users_scanned[_id]['found'][pw_index] = password[pw_index]
-        if ''.join(users_scanned[_id]['found']) == password_string:
-            # kick user out
-            # need to implement
-            emit('game_won', password_string, namespace='/', room=_id)
-        emit('scaned_stuff', (users_points[_id], coords), namespace='/', room=_id)
+        if users_scanned[_id]['progress'] >= 10:  # "seconds" passed
+            random_index = random.choice(users_scanned[_id]['unfound'])
+            users_scanned[_id]['found'][random_index] = password[random_index]
+            users_scanned[_id]['progress'] -= 10  # remove done progress
+            del users_scanned[_id]['unfound'][users_scanned[_id]['unfound'].index(random_index)]
+        user_found_password = ''.join(users_scanned[_id]['found'])
+        if user_found_password == password:
+            # emit game_won, redirect in js
+            emit('game_won', user_found_password, namespace='/', room=_id)
+        else:
+            emit('scaned_stuff', (users_scanned[_id]['progress'],coords,users_scanned[_id]['found']), namespace='/', room=_id)
 
 
 @socketio.on('create_computers_scanning')
 def create_computers_scanning(coords):
     # print('recieved scan!')
-    t = Timer(1, scan_progressed, args=[request.sid, coords])
+    t = Timer(5, scan_progressed, args=[request.sid, coords])
     t.start()
 
 
@@ -166,7 +176,9 @@ def user(id, username):
     users_objects[id] = [com]
     users_points[id] = 0
     users_scanned[id] = {}
-    users_scanned[id]['found'] = ['~' for i in len(password)]
+    users_scanned[id]['found'] = ['~' for i in range(len(password))]
+    users_scanned[id]['unfound'] = [i for i in range(len(password))]
+    users_scanned[id]['progress'] = 0
     emit('add_user', users.values(), namespace='/', broadcast=True)
 
 
@@ -183,7 +195,9 @@ def disconnect():
 
     for index in deleted_index:
         connected.pop(index)
-
+    for com in users_objects[request.sid]:
+        com.set_user(False)
+    
     del users[request.sid]
     del users_objects[request.sid]
     del users_points[request.sid]

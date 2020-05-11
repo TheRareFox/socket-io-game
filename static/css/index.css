@@ -148,3 +148,19 @@ html, body {
 }
 
 .dropdown a:hover {background-color: #ddd;}
+
+#progress-holder{
+  position: fixed;
+  top: 95%;
+  left: 50%;
+  transform: translateY(-50%) translateX(-50%);
+
+  width:400px;
+  height:20px;
+  background:skyblue;
+}
+#scanning_progress{
+  width:0;
+  height:100%;
+background:burlywood;
+}
