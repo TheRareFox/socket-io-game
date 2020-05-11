@@ -174,6 +174,10 @@ function renderBackground(x, y) {
     var scanner = new Image();  // draw scan button
     scanner.src = 'static/pictures/scan.jpg';
     context.drawImage(scanner,canvas.width/2, canvas.height -150, 70, 60);
+    var home = new Image();  // draw scan button
+    home.src = 'static/pictures/home.jpg';
+    context.drawImage(home,canvas.width/2+80, canvas.height -150, 70, 60);
+
 
     //hover elements
     if(hover_create_socket){
@@ -408,6 +412,17 @@ canvas.addEventListener('click', function(event) {
     canvas.addEventListener('click', game_computer_scan, false);
     renderBackground(x,y);
   }
+  else if(canvas.width/2+80<=click_x && click_x<=canvas.width/2+150 && canvas.height -150<=click_y && click_y<= canvas.height -80){
+    one = false;
+    second = false;
+    mine = false;
+    hack = false;
+    scan = false;
+    x = coods[0][0] -600;
+    y = coods[0][1] - 300;
+    renderBackground(x,y);
+  }
+
 
 }, false);
 
