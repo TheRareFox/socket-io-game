@@ -60,7 +60,7 @@ socket.on('create', (objects,linked) => {
 
 
 socket.on('del_user',(user,linked) =>{
-  user = JSON.parse(user);
+  user = JSON.parse(user)[0];
   connected = linked;
   console.log(user);
   users = {};
@@ -76,7 +76,7 @@ socket.on('del_user',(user,linked) =>{
 });
 
 socket.on('add_user', user => {
-  user = JSON.parse(user);
+  user = JSON.parse(user)[0];
   console.log(user);
   users = {};
   keys = [];
