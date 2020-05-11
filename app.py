@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, session, redirect, url_for
 from objects import create_objects, find_object
 import random
 from threading import Timer
+from json import JSONEncoder
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
@@ -128,7 +129,8 @@ def hack_computer(position, username):
                 opponent = computer.get_user()
                 computer.set_user(False)
                 users_points[_id] -= 50
-                emit('del_user', (users.values(), connected), namespace='/', broadcast=True)
+                values = users.values()
+                emit('del_user', (values, connected), namespace='/', broadcast=True)
                 emit('update_hacked_machines', (position), namespace='/', broadcast=True)
                 emit('update_coins', (users_points[_id]), namespace='/', room=_id)
                 emit('got_hacked', ('You just got hacked!'), namespace='/', room=opponent)
@@ -179,7 +181,8 @@ def user(id, username):
     users_scanned[id]['found'] = ['~' for i in range(len(password))]
     users_scanned[id]['unfound'] = [i for i in range(len(password))]
     users_scanned[id]['progress'] = 0
-    emit('add_user', users.values(), namespace='/', broadcast=True)
+    values = users.values()
+    emit('add_user', values , namespace='/', broadcast=True)
 
 
 @socketio.on('disconnect')
@@ -203,7 +206,8 @@ def disconnect():
     del users_points[request.sid]
     del users_scanned[request.sid]
     print(users)
-    emit('del_user', (users.values(), connected), namespace='/', broadcast=True)
+    values = users.values()
+    emit('del_user', (values, connected), namespace='/', broadcast=True)
 
 
 if __name__ == '__main__':
