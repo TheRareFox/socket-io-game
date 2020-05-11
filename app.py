@@ -10,7 +10,7 @@ app.config['SECRET_KEY'] = 'secret!'
 app.config['DEBUG'] = True
 app.config['PRESERVE_CONTEXT_ON_EXCEPTION'] = False
 app.app_context()
-socketio = SocketIO(app, async_mode='threading', logger=True, engineio_logger=True, cors_allowed_origins='https://flask-socketio-game.herokuapp.com')
+socketio = SocketIO(app, async_mode='threading', logger=True, engineio_logger=True, cors_allowed_origins='http://127.0.0.1:5000')#'https://flask-socketio-game.herokuapp.com')
 
 password = 'sTrInG_fOr_TeStIng'
 
@@ -129,7 +129,7 @@ def hack_computer(position, username):
                 opponent = computer.get_user()
                 computer.set_user(False)
                 users_points[_id] -= 50
-                values = list(users.values())
+                values = json.dumps(users.values())
                 emit('del_user', (values, connected), namespace='/', broadcast=True)
                 emit('update_hacked_machines', (position), namespace='/', broadcast=True)
                 emit('update_coins', (users_points[_id]), namespace='/', room=_id)
@@ -181,7 +181,7 @@ def user(id, username):
     users_scanned[id]['found'] = ['~' for i in range(len(password))]
     users_scanned[id]['unfound'] = [i for i in range(len(password))]
     users_scanned[id]['progress'] = 0
-    values = list(users.values())
+    values = json.dumps(users.values())
     emit('add_user', values , namespace='/', broadcast=True)
 
 
@@ -206,7 +206,7 @@ def disconnect():
     del users_points[request.sid]
     del users_scanned[request.sid]
     print(users)
-    values = list(users.values())
+    values = json.dumps(users.values())
     emit('del_user', (values, connected), namespace='/', broadcast=True)
 
 

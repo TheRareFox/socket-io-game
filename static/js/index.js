@@ -60,40 +60,42 @@ socket.on('create', (objects,linked) => {
 
 
 socket.on('del_user',(user,linked) =>{
+  user = JSON.parse(user)[0];
   connected = linked;
   console.log(user);
   users = {};
   keys = [];
-  for(var i = 0;i<user.length;i++){
-    
-    // Now is ['name','coord1','coord2]
-    for(var j = 1;j<user[i].length;j++){
-      users[[user[i][j][0],user[i][j][1]]] = user[i][0];
-      keys.push([user[i][j][0],user[i][j][1]]);
-    }
+  // Now is ['name','coord1','coord2]
+
+  for(var i = 1;i<user.length;i++){
+    users[[user[i][0],user[i][1]]] = user[0];
+    keys.push([user[i][0],user[i][1]]);
   }
   
   console.log(users);
 });
 
 socket.on('add_user', user => {
-  // User = [['name','coord1','coord2],['name2','coord1']]
+  user = JSON.parse(user)[0];
   console.log(user);
   users = {};
   keys = [];
-  for(var i = 0;i<user.length;i++){
-    
-    // Now is ['name','coord1','coord2]
-    for(var j = 1;j<user[i].length;j++){
-      users[[user[i][j][0],user[i][j][1]]] = user[i][0];
-      if((x == 0 || y == 0) && username == user[i][0]){
-        x = user[i][j][0] - 600;
-        y = user[i][j][1] - 300;
-      }
-      keys.push([user[i][j][0],user[i][j][1]]);
+  // Now is ['name','coord1','coord2]
+
+  for(var i = 1;i<user.length;i++){
+    users[[user[i][0],user[i][1]]] = user[0];
+    keys.push([user[i][0],user[i][1]]);
+  }
+  for(var key in users) {
+    if(username == users[key]){
+      coods.push(JSON.parse("[" + key + "]"));
     }
   }
-  
+
+  if(x == 0 && y == 0){
+    x = coods[0][0]-600;
+    y = coods[0][1]-300;
+  }
   console.log(users);
 });
 
