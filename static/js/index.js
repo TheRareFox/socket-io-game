@@ -66,13 +66,14 @@ socket.on('del_user',(user,linked) =>{
   console.log(user);
   users = {};
   keys = [];
-  // Now is ['name','coord1','coord2]
 
-  for(var i = 1;i<user.length;i++){
-    users[[user[i][0],user[i][1]]] = user[0];
-    keys.push([user[i][0],user[i][1]]);
-  }
-  
+  for(var i = 0;i<user.length;i++){
+    // Now is ['name','coord1','coord2]
+    for(var j = 1;j<user[i].length;j++){
+      users[[user[i][j][0],user[i][j][1]]] = user[i][0];
+      keys.push([user[i][j][0],user[i][j][1]]);
+    }
+  }  
   console.log(users);
 });
 
@@ -81,12 +82,14 @@ socket.on('add_user', user => {
   console.log(user);
   users = {};
   keys = [];
-  // Now is ['name','coord1','coord2]
 
-  for(var i = 1;i<user.length;i++){
-    users[[user[i][0],user[i][1]]] = user[0];
-    keys.push([user[i][0],user[i][1]]);
-  }
+  for(var i = 0;i<user.length;i++){
+    // Now is ['name','coord1','coord2]
+    for(var j = 1;j<user[i].length;j++){
+      users[[user[i][j][0],user[i][j][1]]] = user[i][0];
+      keys.push([user[i][j][0],user[i][j][1]]);
+    }
+  }  
   console.log(username);
   for(var key in users) {
     if(username == users[key]){
