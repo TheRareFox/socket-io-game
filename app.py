@@ -237,15 +237,6 @@ def hack_computer(position, username):
                 print(users[request.sid])
                 
                 users_points[_id] -= 50
-                with open('test.txt', 'a') as test_file:
-                    test_file.write('position ' + '-'.join([str(computer.get_coords()[0]), str(computer.get_coords()[1])])+ '\n')
-                    powowiwiw = ''
-                    for i in computer_connections:
-                        powowiwiw += i
-                        powowiwiw += ' '
-                        powowiwiw += ', '.join(computer_connections[i])
-                        powowiwiw += ' NEXT '
-                    test_file.write(powowiwiw + '\n')
                 values = json.dumps(list(users.values()))
                 
                 print('///////////////////////')
