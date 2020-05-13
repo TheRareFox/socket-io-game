@@ -75,7 +75,6 @@ def delete_tree(computer_location):
         computer_location = '-'.join([str(computer_location[0]), str(computer_location[1])])
     for i in computer_connections[computer_location]:
         delete_tree(i)
-    emit('del_self',(str(computer_location.split('-'))))
     del computer_connections[computer_location]
 
 
@@ -96,6 +95,7 @@ def delete_from_all(computer_location):
         print(connected[i][0], type(connected[i][0]))
         print(connected[i][1], type(connected[i][1]))
         if connected[i][0] == computer_location or connected[i][1] == computer_location:
+            emit('del_self',(str(computer_location)))
             del connected[i]
             print('deleted')
             break
