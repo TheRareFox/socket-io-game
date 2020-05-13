@@ -95,7 +95,7 @@ def delete_from_all(computer_location, user_room):
         print(i)
         print(connected[i][0], type(connected[i][0]))
         print(connected[i][1], type(connected[i][1]))
-        emit('got_hacked', (computer_location), namespace='/', room=user_room)
+        # emit('got_hacked', (computer_location), namespace='/', room=user_room)
         if connected[i][0] == computer_location or connected[i][1] == computer_location:
             emit('del_self',(str(computer_location)))
             del connected[i]
