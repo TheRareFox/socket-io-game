@@ -82,7 +82,16 @@ socket.on('del_self', (coords) => {
       coods.splice(i,1);
     }
   }
-  console.log(coods);
+  for(var i = 0;i<mining.length;i++){
+    if(mining[i][0] == coords[0] && mining[i][1] == coords[1]){
+      mining.splice(i,1);
+    }
+  }
+  for(var i = 0;i<computers_scanning.length;i++){
+    if(computers_scanning[i][0] == coords[0] && computers_scanning[i][1] == coords[1]){
+      computers_scanning.splice(i,1);
+    }
+  }
 });
 
 
