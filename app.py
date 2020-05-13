@@ -78,7 +78,8 @@ def delete_tree(computer_location):
     del computer_connections[computer_location]
 
 
-def delete_from_all(computer_location):
+def delete_from_all(computer_location, user_room):
+    
     if type(computer_location) == list:
         computer_location_str = '-'.join([str(computer_location[0]), str(computer_location[1])])
     else:
@@ -88,12 +89,13 @@ def delete_from_all(computer_location):
     
     print(computer_location)
     for i in computer_connections[computer_location_str]:
-        delete_from_all(i)
+        delete_from_all(i, user_room)
     for i in range(len(connected)):
         print('CONNECTED => ', connected)
         print(i)
         print(connected[i][0], type(connected[i][0]))
         print(connected[i][1], type(connected[i][1]))
+        emit('got_hacked', (computer_location), namespace='/', room=user_room)
         if connected[i][0] == computer_location or connected[i][1] == computer_location:
             emit('del_self',(str(computer_location)))
             del connected[i]
@@ -104,6 +106,8 @@ def delete_from_all(computer_location):
             print('USERS => ', users)
             print(i)
             if users[key][i] == computer_location:
+                computer = find_object(computers, computer_location)
+                computer.set_user(False)
                 del users[key][i]
                 break
     del computer_connections[computer_location_str]
@@ -191,14 +195,16 @@ def hack_computer(position, username):
             computer = find_object(computers, position)
             print('='*50)
             print(computer.get_coords())
-            get_home_location = home_location[computer.get_user()].split('-')
+            get_hacked_user = computer.get_user()
+            get_home_location = home_location[get_hacked_user].split('-')
             get_home_location = [int(i) for i in get_home_location]
-            if not computer.get_user():
+            if not get_hacked_user:
                 emit('fail_create_connection', ('You cannot hack this!'))
-            # elif len(users[computer.get_user()]) > 2:
+            # elif len(users[get_hacked_user]) > 2:
             elif computer.get_coords() == get_home_location:
                 emit('fail_create_connection', ("You cannot a person's home base!"))
             elif computer.get_coords() != get_home_location:
+                opponent = computer.get_user()
                 # already have user
                 # to_be_deleted = []
                 print(connected)
@@ -216,12 +222,12 @@ def hack_computer(position, username):
                 #         if users[key][i] == position:
                 #             del users[key][i]
                 #             break
-                delete_from_all(computer.get_coords())
+                delete_from_all(computer.get_coords(), get_hacked_user)
                 print('values'+'-'*100)
                 for i in computer_connections:
                     print(i)
                     print(computer_connections[i])
-                delete_tree_loc(home_location[computer.get_user()], computer.get_coords())
+                delete_tree_loc(home_location[get_hacked_user], computer.get_coords())
                 print('hacked' + '='*100)
                 print(connected)
                 print(users)
@@ -229,8 +235,7 @@ def hack_computer(position, username):
                 # del users[request.sid][users[request.sid].index(position)]
                 # del users_objects[request.sid][users_objects[request.sid].index(computer)]
                 print(users[request.sid])
-                opponent = computer.get_user()
-                computer.set_user(False)
+                
                 users_points[_id] -= 50
                 with open('test.txt', 'a') as test_file:
                     test_file.write('position ' + '-'.join([str(computer.get_coords()[0]), str(computer.get_coords()[1])])+ '\n')
@@ -247,7 +252,7 @@ def hack_computer(position, username):
                 print(values)
                 emit('del_user', (values, connected), namespace='/', broadcast=True)
                 emit('update_coins', (users_points[_id]), namespace='/', room=_id)
-                emit('got_hacked', ('You just got hacked!',position), namespace='/', room=opponent)
+                emit('fail_create_connection', ('You just got hacked!'), namespace='/', room=opponent)
             elif len(users[computer.get_user()]) <= 2:
                 emit('fail_create_connection', ("You cannot hack a person's last connection!"))
             else:
@@ -293,7 +298,7 @@ def user(id, username):
         emit('add_self',values, namespace='/',room = id)
     users[id].append(com.get_coords())
     users_objects[id] = [com]
-    users_points[id] = 0
+    users_points[id] = 1200
     users_scanned[id] = {}
     users_scanned[id]['found'] = ['~' for i in range(len(password))]
     users_scanned[id]['unfound'] = [i for i in range(len(password))]

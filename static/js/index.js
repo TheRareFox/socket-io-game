@@ -1,8 +1,6 @@
 const canvas = document.getElementById('canvas');
 const context = canvas.getContext('2d');
 
-//music
-var bg_music = new Audio('static/audio/bg_music.mp3');
 
 //password
 var password = [];
@@ -70,7 +68,7 @@ socket.on('create', (objects,linked) => {
 
 
 socket.on('add_self', (coords) => {
-  console.log(coords);
+  //console.log(coords);
   coods.push(JSON.parse(coords));
   //console.log('hi');
 });
@@ -96,10 +94,10 @@ socket.on('del_self', (coords) => {
 
 
 socket.on('del_user',(user,linked) =>{
-  console.log(user);
+  //console.log(user);
   user = JSON.parse(user);
   connected = linked;
-  console.log(user);
+  //console.log(user);
   users = {};
   keys = [];
 
@@ -115,7 +113,7 @@ socket.on('del_user',(user,linked) =>{
 
 socket.on('add_user', user => {
   user = JSON.parse(user);
-  console.log(user);
+  //console.log(user);
   users = {};
   keys = [];
 
@@ -176,7 +174,7 @@ function renderBackground(x, y) {
   }
   //draw crown
   if (coods[0]){
-    console.log(coods[0][0]);
+    //console.log(coods[0][0]);
     var crown = new Image();
     crown.src = 'static/pictures/crown.jpg';
     context.drawImage(crown,coods[0][0]-x,coods[0][1]-y-30, 30, 30);
@@ -397,7 +395,7 @@ function renderBackground(x, y) {
   
   //draw connected lines
   for(var i = 0;i<connected.length;i++){
-    console.log(connected[i]);
+    //console.log(connected[i]);
     context.beginPath();
     context.moveTo(connected[i][0][0]-x+15,connected[i][0][1]-y);
     context.lineTo(connected[i][1][0]-x+15,connected[i][1][1]-y);
@@ -425,7 +423,7 @@ function renderBackground(x, y) {
 }
   
 function dragMouse(canvas){
-    console.log("Hi");
+    console.log("Hi"); // bruh
     canvas.onmousedown = dragMouseDown;
     var posx = 0;
     var posy = 0;
@@ -514,8 +512,8 @@ canvas.onmousemove = function(e) {
 canvas.addEventListener('click', function(event) {
   var click_x = event.x;
   var click_y = event.y;
-  console.log(click_x);
-  console.log(click_y);
+  //console.log(click_x);
+  //console.log(click_y);
   // connect option
   if(canvas.width/2 -240<=click_x && click_x<=canvas.width/2 -170 && canvas.height -150<=click_y && click_y<=canvas.height -80){
     console.log('clicked');
@@ -757,23 +755,6 @@ socket.on('remove_connections', (hacked_coord) => {
   renderBackground(x,y);
 });
 
-socket.on('got_hacked', (message,position) => {
-  alert(message);
-  for (var j=0;j<mining.length;j++){
-    // check if computer scanning
-    if(mining[j][0] == position[i][0] && mining[j][1] == position[i][1]){
-      mining.splice(j,1);
-      renderBackground(x,y);
-    }
-  }
-  for(j=0;j<computers_scanning.length;j++){
-    if(computers_scanning[j][0] == coods[i][0] && computers_scanning[j][1] == coods[i][1]){
-      computers_scanning.splice(j,1);
-      renderBackground(x,y);
-    }
-  }
-});
-
 
 function game_computer_scan(event){
   var click_x = event.x+x;
@@ -857,10 +838,5 @@ function Remove(){
   playMenu.classList.add('hidden');
   console.log(username);
   socket.emit('user',(socket.id),(username));
-  bg_music.play();
-  window.setInterval(function(){
-    console.log('playing music');
-    bg_music.play();
-  },65000)
   renderBackground(x,y);
 }
