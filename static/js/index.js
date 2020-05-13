@@ -82,6 +82,7 @@ socket.on('del_self', (coords) => {
       coods.splice(i,1);
     }
   }
+  console.log(coods);
 });
 
 
