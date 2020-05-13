@@ -79,7 +79,7 @@ socket.on('del_self', (coords) => {
   coords = JSON.parse(coords);
   for(var i =0;i<coods.length;i++){
     if(coods[i][0] == coords[0] && coods[i][1] == coords[1]){
-      coords.splice(i,1);
+      coods.splice(i,1);
     }
   }
 });
