@@ -96,6 +96,7 @@ def delete_from_all(computer_location):
         if connected[i][0] == computer_location or connected[i][1] == computer_location:
             computer = find_object(computers, computer_location)
             computer.set_user(False)
+            emit('del_self',(str(connected[i])))
             del connected[i]
             print('deleted')
             break
