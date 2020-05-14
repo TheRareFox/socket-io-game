@@ -11,6 +11,7 @@ var hover_mine = false;
 var hover_hack = false;
 var hover_scan = false;
 var hover_home = false;
+var hover_video = false;
 
 var socket = io();
 // all the computers available [[x, y], [x1, y1]]
@@ -217,6 +218,11 @@ function renderBackground(x, y) {
   var home = new Image();  // draw scan button
   home.src = 'static/pictures/home.jpg';
   context.drawImage(home,canvas.width/2+80, canvas.height -150, 70, 60);
+  var video = new Image();  // draw video button
+  video.src = 'static/pictures/video.jpg';
+  context.drawImage(video,canvas.width/2+160, canvas.height -150, 70, 60);
+
+
 
 
   //hover elements
@@ -332,6 +338,23 @@ function renderBackground(x, y) {
     context.fillText(text,canvas.width/2-140,canvas.height/2+40,290);
     text = "(it's a little off center but it's fine)";
     context.fillText(text,canvas.width/2-140,canvas.height/2+60,290);
+  } else if(hover_video){
+    context.globalAlpha = 0.7;
+    context.fillStyle = 'black';
+    context.fillRect(canvas.width/2-150, canvas.height/2-45, 330, 120); 
+    context.globalAlpha = 1;
+      
+    context.fillStyle = '#ffcc33';
+    text = 'Video tutorial';
+    context.fillText(text,canvas.width/2-140,canvas.height/2-20,290);
+    context.fillStyle = '#33ccff';
+    text = 'Click this button to watch'
+    context.fillText(text,canvas.width/2-140,canvas.height/2+20,290);
+    text = 'a video tutorial explaining';
+    context.fillText(text,canvas.width/2-140,canvas.height/2+40,290);
+    text = "how to git gud at this game!";
+    context.fillText(text,canvas.width/2-140,canvas.height/2+60,290);
+
   }
 
   //remove game-create-socket
@@ -490,7 +513,12 @@ canvas.onmousemove = function(e) {
   } else if(canvas.width/2+80<=hover_x && hover_x<=canvas.width/2+150 && canvas.height -150<=hover_y && hover_y<= canvas.height -80){
     hover_home = true;
     renderBackground(x,y);
-  } else{
+  } else if(canvas.width/2+160<=hover_x && hover_x<=canvas.width/2+230 && canvas.height -150<=hover_y && hover_y<= canvas.height -80){
+    hover_video = true;
+    renderBackground(x,y);
+  } 
+  
+  else{
     if (hover_create_socket){  // don't need to redraw every time mouse move
       hover_create_socket = false;
       renderBackground(x,y);
@@ -506,7 +534,11 @@ canvas.onmousemove = function(e) {
     } else if (hover_home){
       hover_home = false;
       renderBackground(x,y);
+    } else if (hover_video){
+      hover_video = false;
+      renderBackground(x,y);
     }
+    
   }
 
    
@@ -571,6 +603,10 @@ canvas.addEventListener('click', function(event) {
     y = coods[0][1] - 300;
     renderBackground(x,y);
   }
+  else if(canvas.width/2+160<=click_x && click_x<=canvas.width/2+230 && canvas.height -150<=click_y && click_y<= canvas.height -80){
+    window.open('https://www.youtube.com', '_blank');
+  }
+
 
 
 }, false);
