@@ -605,7 +605,7 @@ canvas.addEventListener('click', function(event) {
   }
 }, false);
 
-myCanvas.addEventListener('dblclick', function(){ 
+canvas.addEventListener('dblclick', function(){ 
   var click_x = event.x;
   var click_y = event.y;
 
