@@ -286,7 +286,7 @@ def user(id, username):
         emit('add_self',values, namespace='/',room = id)
     users[id].append(com.get_coords())
     users_objects[id] = [com]
-    users_points[id] = 0
+    users_points[id] = 20
     users_scanned[id] = {}
     users_scanned[id]['found'] = ['~' for i in range(len(password))]
     users_scanned[id]['unfound'] = [i for i in range(len(password))]
