@@ -127,7 +127,7 @@ def delete_tree_loc(computer_location, thing):
 
 @app.route('/')
 def index():
-    if len(users)>=5:
+    if len(users)>=25:
         return redirect('https://bbcs2020-apt-get-socket-game.herokuapp.com/')
     return render_template('index.html')
 
