@@ -348,7 +348,7 @@ function renderBackground(x, y) {
     text = 'Video tutorial';
     context.fillText(text,canvas.width/2-140,canvas.height/2-20,290);
     context.fillStyle = '#33ccff';
-    text = 'Click this button to watch'
+    text = 'Double click this button to watch'
     context.fillText(text,canvas.width/2-140,canvas.height/2+20,290);
     text = 'a video tutorial explaining';
     context.fillText(text,canvas.width/2-140,canvas.height/2+40,290);
@@ -603,13 +603,17 @@ canvas.addEventListener('click', function(event) {
     y = coods[0][1] - 300;
     renderBackground(x,y);
   }
-  else if(canvas.width/2+160<=click_x && click_x<=canvas.width/2+230 && canvas.height -150<=click_y && click_y<= canvas.height -80){
+}, false);
+
+myCanvas.addEventListener('dblclick', function(){ 
+  var click_x = event.x;
+  var click_y = event.y;
+
+  if(canvas.width/2+160<=click_x && click_x<=canvas.width/2+230 && canvas.height -150<=click_y && click_y<= canvas.height -80){
     window.open('https://youtu.be/RyQisVQCE0U', '_blank');
   }
+}
 
-
-
-}, false);
 
 function game_set_mining(event){
   var click_x = event.x+x;
