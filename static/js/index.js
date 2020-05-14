@@ -604,7 +604,7 @@ canvas.addEventListener('click', function(event) {
     renderBackground(x,y);
   }
   else if(canvas.width/2+160<=click_x && click_x<=canvas.width/2+230 && canvas.height -150<=click_y && click_y<= canvas.height -80){
-    window.open('https://www.youtube.com', '_blank');
+    window.open('https://youtu.be/RyQisVQCE0U', '_blank');
   }
 
 
