@@ -127,6 +127,8 @@ def delete_tree_loc(computer_location, thing):
 
 @app.route('/')
 def index():
+    if len(users)>=5:
+        return redirect('https://bbcs2020-apt-get-socket-game.herokuapp.com/')
     return render_template('index.html')
 
 
@@ -141,8 +143,6 @@ def win():
 
 @socketio.on('connect')
 def connect():
-    if len(users)>=5:
-        return redirect('https://bbcs2020-apt-get-socket-game.herokuapp.com/')
     coords = [computer.get_coords() for computer in computers]
     room = session.get('room')
     join_room(room)
