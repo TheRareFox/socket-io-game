@@ -777,6 +777,7 @@ function game_computer_scan(event){
   var click_x = event.x+x;
   var click_y = event.y+y;
   if(canvas.width/2<=click_x-x && click_x-x<=canvas.width/2+70 && canvas.height-150 <= click_y-y && click_y-y <= canvas.height -80){
+    scan = false;
     renderBackground(x,y);
   } else{
     for(var i = 0;i<coods.length;i++){
