@@ -40,7 +40,7 @@ var second = false;
 //mining
 var mine = false;
 var mining = [];
-var coins = 0;
+var coins = 20;
 
 //hacking
 var hack = false;   
