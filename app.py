@@ -141,6 +141,8 @@ def win():
 
 @socketio.on('connect')
 def connect():
+    if len(users)>=20:
+        return redirect('https://flasksocketgame2.herokuapp.com/')
     coords = [computer.get_coords() for computer in computers]
     room = session.get('room')
     join_room(room)
