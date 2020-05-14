@@ -612,7 +612,7 @@ myCanvas.addEventListener('dblclick', function(){
   if(canvas.width/2+160<=click_x && click_x<=canvas.width/2+230 && canvas.height -150<=click_y && click_y<= canvas.height -80){
     window.open('https://youtu.be/RyQisVQCE0U', '_blank');
   }
-}
+});
 
 
 function game_set_mining(event){
