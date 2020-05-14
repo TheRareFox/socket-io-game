@@ -32,8 +32,8 @@ connected = []
 '''dictionary containing home locations
 example: 
 home_location = {
-    1234: {'home': ['x1-y1'] }, 
-    1274: {'home': ['x2-y2'] },
+    1234: {'home': 'x1-y1' }, 
+    1274: {'home': 'x2-y2' },
     ... ...
 }'''
 home_location = {}
@@ -41,9 +41,9 @@ home_location = {}
 '''dictionary that contain next linked computers.
 example:
 computer_connections = {
-    ['x4-y4']: [ ['x2-y2'], ['x8-y8'] ],
-    ['x2-y2']: [ ['x5-y5'], ['x3-y3'] ],
-    ['x1-y1']: [ ['x9-y9'], ['x4-y4'] ],
+    'x4-y4': ['x2-y2', 'x8-y8'],
+    'x2-y2': ['x5-y5', 'x3-y3'],
+    'x1-y1': ['x9-y9', 'x4-y4'],
     ... ...
 }'''
 computer_connections = {}
@@ -97,7 +97,7 @@ def delete_from_all(computer_location, user_room):
         print(connected[i][1], type(connected[i][1]))
         # emit('got_hacked', (computer_location), namespace='/', room=user_room)
         if connected[i][0] == computer_location or connected[i][1] == computer_location:
-            emit('del_self',(str(computer_location)))
+            emit('del_self',(str(computer_location)), namespace='/', room=user_room)
             del connected[i]
             print('deleted')
             break
@@ -116,12 +116,13 @@ def delete_from_all(computer_location, user_room):
 def delete_tree_loc(computer_location, thing):
     if type(computer_location) == list:
         computer_location = '-'.join([str(computer_location[0]), str(computer_location[1])])
-    try:
+    if type(thing) == list:
+        thing = '-'.join([str(thing[0]), str(thing[1])])
+    if thing in computer_connections[computer_location]:
+        computer_connections[computer_location].remove(thing)
+    elif computer_location in computer_connections:
         for i in computer_connections[computer_location]:
             delete_tree_loc(i, thing)
-    except KeyError:
-        if computer_connections[computer_location] == thing:
-            del computer_connections[computer_location]
 
 
 @app.route('/')
@@ -149,33 +150,26 @@ def connect():
 @socketio.on('build_socket')
 def build_socket(first_pos, second_pos, username, cost):
     computer = find_object(computers, second_pos)
+    _id = request.sid
     if not computer:
         emit('fail_create_connection', ('There is nothing there!'))
     if computer.get_user():
         # already have user
         emit('fail_create_connection', ('You cannot occupy the server cause someone else is there! You have to attack'))
-    elif users_points[request.sid] < cost:
+    elif users_points[_id] < cost:
         emit('fail_create_connection', ('Not enough coins!'))
     else:
-        users_points[request.sid] -= cost
+        users_points[_id] -= cost
         connected.append([first_pos, second_pos])
-        users[request.sid].append(second_pos)
-        users_objects[request.sid].append(computer)
-        computer.set_user(request.sid)
+        users[_id].append(second_pos)
+        users_objects[_id].append(computer)
+        computer.set_user(_id)
         computer_connections['-'.join([str(first_pos[0]), str(first_pos[1])])].append('-'.join([str(second_pos[0]), str(second_pos[1])]))
         computer_connections['-'.join([str(second_pos[0]), str(second_pos[1])])] = []
         
-        with open('test.txt', 'a') as test_file:
-            powowiwiw = ''
-            for i in computer_connections:
-                powowiwiw += i
-                powowiwiw += ' '
-                powowiwiw += ', '.join(computer_connections[i])
-                powowiwiw += ' NEXT '
-            test_file.write(powowiwiw + '\n')
-        
-        emit('add_self',(str(second_pos)), namespace='/', room = request.sid)
-        emit('create_connections', (first_pos, second_pos, username, users_points[request.sid]), namespace='/', broadcast=True)
+        emit('add_self',(str(second_pos)), namespace='/', room = _id)
+        emit('update_coins', (users_points[request.sid]), namespace='/', room = _id)
+        emit('create_connections', (first_pos, second_pos, username), namespace='/', broadcast=True)
 
 
 @socketio.on('create_mining')
@@ -196,12 +190,13 @@ def hack_computer(position, username):
             print('='*50)
             print(computer.get_coords())
             get_hacked_user = computer.get_user()
-            get_home_location = home_location[get_hacked_user].split('-')
-            get_home_location = [int(i) for i in get_home_location]
             if not get_hacked_user:
                 emit('fail_create_connection', ('You cannot hack this!'))
+
+            get_home_location = home_location[get_hacked_user].split('-')
+            get_home_location = [int(i) for i in get_home_location]
             # elif len(users[get_hacked_user]) > 2:
-            elif computer.get_coords() == get_home_location:
+            if computer.get_coords() == get_home_location:
                 emit('fail_create_connection', ("You cannot a person's home base!"))
             elif computer.get_coords() != get_home_location:
                 opponent = computer.get_user()
@@ -289,7 +284,7 @@ def user(id, username):
         emit('add_self',values, namespace='/',room = id)
     users[id].append(com.get_coords())
     users_objects[id] = [com]
-    users_points[id] = 1200
+    users_points[id] = 0
     users_scanned[id] = {}
     users_scanned[id]['found'] = ['~' for i in range(len(password))]
     users_scanned[id]['unfound'] = [i for i in range(len(password))]
@@ -297,16 +292,6 @@ def user(id, username):
     print(com.get_coords()[0], com.get_coords()[1])
     home_location[id] = '-'.join([str(com.get_coords()[0]), str(com.get_coords()[1])])
     computer_connections['-'.join([str(com.get_coords()[0]), str(com.get_coords()[1])])] = []
-    
-    with open('test.txt', 'a') as test_file:
-        test_file.write('base ' + home_location[id] + '\n')
-        powowiwiw = ''
-        for i in computer_connections:
-            powowiwiw += i
-            powowiwiw += ' '
-            powowiwiw += ', '.join(computer_connections[i])
-            powowiwiw += ' NEXT '
-        test_file.write(powowiwiw + '\n')
     
     values = json.dumps(list(users.values()))
     emit('add_user', values , namespace='/', broadcast=True)
@@ -338,14 +323,6 @@ def disconnect():
     del home_location[request.sid]
 
     print(users)
-    with open('test.txt', 'a') as test_file:
-        powowiwiw = ''
-        for i in computer_connections:
-            powowiwiw += i
-            powowiwiw += ' '
-            powowiwiw += ', '.join(computer_connections[i])
-            powowiwiw += ' NEXT '
-        test_file.write(powowiwiw + '\n')
     values = json.dumps(list(users.values()))
     emit('del_user', (values, connected), namespace='/', broadcast=True)
 

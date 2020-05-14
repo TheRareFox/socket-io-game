@@ -75,17 +75,17 @@ socket.on('add_self', (coords) => {
 
 socket.on('del_self', (coords) => {
   coords = JSON.parse(coords);
-  for(var i =0;i<coods.length;i++){
+  for(i=0;i<coods.length;++i){
     if(coods[i][0] == coords[0] && coods[i][1] == coords[1]){
       coods.splice(i,1);
     }
   }
-  for(var i = 0;i<mining.length;i++){
+  for(i=0;i<mining.length;++i){
     if(mining[i][0] == coords[0] && mining[i][1] == coords[1]){
       mining.splice(i,1);
     }
   }
-  for(var i = 0;i<computers_scanning.length;i++){
+  for(i=0;i<computers_scanning.length;++i){
     if(computers_scanning[i][0] == coords[0] && computers_scanning[i][1] == coords[1]){
       computers_scanning.splice(i,1);
     }
@@ -109,6 +109,8 @@ socket.on('del_user',(user,linked) =>{
     }
   }  
   console.log(users);
+  renderBackground(x,y);
+
 });
 
 socket.on('add_user', user => {
@@ -131,6 +133,8 @@ socket.on('add_user', user => {
     y = coods[0][1]-300;
   }
   console.log(users);
+  renderBackground(x,y);
+
 });
 
 
@@ -583,7 +587,7 @@ function game_set_mining(event){
     if(coods[i][0]<=click_x && click_x<=coods[i][0]+40 && coods[i][1]<=click_y && click_y<=coods[i][1]+40){
       var stop = false;
       //console.log(mining);
-      for (var j=0;j<mining.length;j++){
+      for(j=0;j<mining.length;j++){
         if(mining[j][0] == coods[i][0] && mining[j][1] == coods[i][1]){
           stop = true;
           mine = false;
@@ -681,7 +685,7 @@ function game_make_socket_second(event) {
       if(computers[i][0]<=click_x && click_x<=computers[i][0]+30 && computers[i][1]<=click_y && click_y <=computers[i][1]+30){
         console.log('second computer created');
         second = false;
-        
+        renderBackground(x,y);
         //caculate cost
         diff_x = first[0] - computers[i][0];
         diff_y = first[1] - computers[i][1];
@@ -689,25 +693,38 @@ function game_make_socket_second(event) {
         cost = Math.round(distance * 0.05);
         console.log('cost:');
         console.log(cost.toString());
-        alert('It will cost: ' + cost.toString());
+        context.globalAlpha = 0.5;
+        context.fillStyle = 'black';
+        context.fillRect(0, 0, canvas.width, 200);
+        context.globalAlpha = 1;
+        text = 'It costs: ' + cost.toString()
+        context.fillStyle = 'white';
+        context.fillText(text,canvas.width/2-150,100,1000);      
+        //alert('It will cost: ' + cost.toString());
         //To be made into socket thingy
         socket.emit('build_socket',(first),([computers[i][0],computers[i][1]]),(username),(cost));
     }
   }
   }
 }
-socket.on('create_connections', (cd1,cd2,name,points) => {
-  coins = points;
+socket.on('create_connections', (cd1,cd2,name) => {
   console.log('creating');
   connected.push([cd1,cd2]);
   console.log(connected);
   users[cd2] = name;
   //console.log(users);
-  renderBackground(x,y);
 });
 
 socket.on('fail_create_connection', message => {
-  alert(message);
+  renderBackground(x,y);
+  context.globalAlpha = 0.5;
+  context.fillStyle = 'black';
+  context.fillRect(0, 0, canvas.width, 200);
+  context.globalAlpha = 1;
+  
+  context.fillStyle = 'white';
+  context.fillText(message,canvas.width/2-150,100,1000);
+  //alert(message);
 });
 
 
